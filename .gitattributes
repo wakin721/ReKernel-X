@@ -1,0 +1,3 @@
+* text=auto eol=lf
+profiles/lineage-mayfly/kernel.config -text
+profiles/lineage-mayfly/Module.symvers -text

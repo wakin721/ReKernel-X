@@ -1,0 +1,68 @@
+name: Build LineageOS Xiaomi 12S (mayfly)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [lineage-mayfly]
+    paths:
+      - 'LKM-Source/**'
+      - 'profiles/lineage-mayfly/**'
+      - 'ci/mayfly/**'
+      - '.github/workflows/lineage-mayfly.yml'
+  pull_request:
+    branches: [lineage-mayfly]
+    paths:
+      - 'LKM-Source/**'
+      - 'profiles/lineage-mayfly/**'
+      - 'ci/mayfly/**'
+      - '.github/workflows/lineage-mayfly.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mayfly-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-aarch64-linux-gnu flex bison bc \
+            libssl-dev libelf-dev libncurses-dev libxml2 libtinfo6 rsync cpio \
+            python3-venv curl xz-utils zstd
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install -r ci/mayfly/requirements.txt
+          echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
+      - name: Cache pinned source and compiler archives
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ${{ runner.temp }}/mayfly-downloads
+          key: mayfly-downloads-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('profiles/lineage-mayfly/profile.json') }}
+      - name: Build, validate ABI and package
+        env:
+          BUILD_ROOT: ${{ runner.temp }}/mayfly-build
+          DOWNLOAD_CACHE: ${{ runner.temp }}/mayfly-downloads
+        run: |
+          set -o pipefail
+          mkdir -p dist
+          bash ci/mayfly/build.sh 2>&1 | tee dist/build.log
+      - name: Upload installable ZIP and validation evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ReKernel-X-LineageOS-mayfly-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mayfly-build-failure-${{ github.run_id }}
+          path: dist/
+          if-no-files-found: ignore
