@@ -8,15 +8,9 @@ if [ -e "$MODDIR/.boot-pending" ]; then
     sync
     exit 1
 fi
-if [ "$(uname -r)" != "5.10.260-gki-gef362912d37b" ]; then
-    echo "Kernel release changed; module disabled." > "$LOG"
-    touch "$MODDIR/disable"
-    sync
-    exit 1
-fi
-config_hash=$(zcat /proc/config.gz 2>/dev/null | sha256sum | cut -d ' ' -f 1)
-if [ "$config_hash" != "0eae19ac5cf26d9314ab4de5eae1e7e4419f43e12c1042e3b6f90a75e0dec4e5" ]; then
-    echo "Kernel configuration changed; module disabled." > "$LOG"
+. "$MODDIR/compatibility.sh"
+if ! rkx_check_compatibility; then
+    echo "${RKX_ERROR:-Compatibility verification failed}; module disabled." > "$LOG"
     touch "$MODDIR/disable"
     sync
     exit 1
@@ -27,7 +21,8 @@ if [ -d /sys/module/rekernel_x ]; then
 fi
 touch "$MODDIR/.boot-pending" || exit 1
 sync
-insmod "$MODDIR/rekernel_x-lineage-mayfly.ko" > "$LOG" 2>&1
+echo "Validated kernel: $(uname -r); reusing module with native CRC checks." > "$LOG"
+insmod "$MODDIR/rekernel_x-lineage-mayfly.ko" >> "$LOG" 2>&1
 result=$?
 echo "insmod_exit=$result" >> "$LOG"
 if [ "$result" -ne 0 ]; then

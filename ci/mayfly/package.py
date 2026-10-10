@@ -5,17 +5,23 @@ import zipfile
 from pathlib import Path
 
 from verify import check_module, sha256
+from reuse import check_compatible_profiles
 
 root = Path(__file__).resolve().parents[2]
 profile_dir = root / 'profiles/lineage-mayfly'
 profile = json.loads((profile_dir / 'profile.json').read_text())
 dist = root / 'dist'
 module = dist / 'rekernel_x-lineage-mayfly.ko'
-validation = check_module(profile_dir, module)
+validation, compatible_kernels = check_compatible_profiles(root, module)
+manifest = json.loads((root / 'profiles/mayfly-compatibility.json').read_text())
+module_reused = sha256(module) == manifest['prebuilt_sha256']
 commit = subprocess.check_output(['git', '-C', str(root), 'rev-parse', 'HEAD'], text=True).strip()
 dirty = subprocess.check_output(['git', '-C', str(root), 'status', '--porcelain'], text=True).strip()
 metadata = dict(profile, source_commit=commit, source_worktree_dirty=bool(dirty),
-                validation=validation, runtime_test='CI validates ABI only; device testing is separate.')
+                validation=validation, compatible_kernels=compatible_kernels,
+                module_reused_without_compilation=module_reused,
+                module_source_commit=manifest['module_source_commit'] if module_reused else commit,
+                runtime_test='CI validates ABI only; device testing is separate.')
 metadata['compiler'] = (dist / 'compiler.txt').read_text()
 metadata['config_diff'] = (dist / 'config-diff.txt').read_text()
 metadata_text = json.dumps(metadata, ensure_ascii=False, indent=2) + '\n'
@@ -33,12 +39,13 @@ add_tree(root / 'ci/mayfly/package', '')
 add_tree(root / 'template/META-INF', 'META-INF/')
 add_tree(root / 'LKM-Source', 'source/LKM-Source/')
 add_tree(root / 'ci/mayfly', 'source/ci/mayfly/')
-add_tree(profile_dir, 'source/profiles/lineage-mayfly/')
+add_tree(root / 'profiles', 'source/profiles/')
 files['LICENSE'] = (root / 'LICENSE').read_bytes()
 files['source/README.md'] = (root / 'README.md').read_bytes()
 files['build-info.json'] = metadata_text.encode('utf-8')
 files[module.name] = module.read_bytes()
-filename = 'ReKernel-X-1.6-LineageOS-mayfly-5.10.260.zip'
+files['module.sha256'] = (sha256(module) + '\n').encode('ascii')
+filename = 'ReKernel-X-1.6-LineageOS-mayfly-compatible.zip'
 with zipfile.ZipFile(dist / filename, 'w', zipfile.ZIP_DEFLATED) as archive:
     for name, content in sorted(files.items()):
         entry = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))

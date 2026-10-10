@@ -1,0 +1,51 @@
+name: Package compatible mayfly module (no compilation)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [lineage-mayfly]
+    paths:
+      - 'profiles/**'
+      - 'prebuilt/mayfly/**'
+      - 'ci/mayfly/package/**'
+      - 'ci/mayfly/package.py'
+      - 'ci/mayfly/reuse.py'
+      - 'ci/mayfly/verify.py'
+      - 'ci/mayfly/requirements.txt'
+      - 'ci/mayfly/test_*.py'
+      - '.github/workflows/reuse-mayfly.yml'
+  pull_request:
+    branches: [lineage-mayfly]
+    paths:
+      - 'profiles/**'
+      - 'prebuilt/mayfly/**'
+      - 'ci/mayfly/**'
+      - '.github/workflows/reuse-mayfly.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Install validation dependency
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install -r ci/mayfly/requirements.txt
+          echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
+      - name: Test installation and boot policy
+        run: python -m unittest discover -s ci/mayfly -p 'test_*.py' -v
+      - name: Validate existing module and package without compiling
+        run: |
+          set -o pipefail
+          mkdir -p dist
+          python ci/mayfly/reuse.py | tee dist/reuse.log
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ReKernel-X-mayfly-compatible-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30

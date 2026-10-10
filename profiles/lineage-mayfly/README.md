@@ -1,6 +1,6 @@
 # LineageOS Xiaomi 12S profile
 
-This profile applies only to `mayfly`, kernel `5.10.260-gki-gef362912d37b`,
+This build profile records `mayfly`, kernel `5.10.260-gki-gef362912d37b`,
 with the exact `kernel.config` recorded here. The reference system was
 `23.2-20260925-NIGHTLY-mayfly`. It is not a general Android 12/13 GKI profile.
 
@@ -44,5 +44,8 @@ artifact is not automatically device-tested. CRCs cover exported interfaces;
 they do not prove all internal hooks or runtime behavior are correct.
 
 After a kernel/ROM update, collect and review the new source, config, compiler
-and export CRCs and make a new profile. Do not edit vermagic, remove `__versions`,
+and export CRCs and make a new profile. Compatible profiles reuse the existing
+module without compilation; see `profiles/mayfly-compatibility.json`. The loader
+compares canonical CONFIG assignments, ignoring version comments and ordering.
+Do not edit vermagic, remove `__versions`,
 disable CFI or relax the installer checks to force a mismatch to load.

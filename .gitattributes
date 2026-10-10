@@ -1,3 +1,7 @@
 * text=auto eol=lf
 profiles/lineage-mayfly/kernel.config -text
 profiles/lineage-mayfly/Module.symvers -text
+profiles/lineage-mayfly-5.10.269/kernel.config -text
+profiles/lineage-mayfly-5.10.269/Module.symvers -text
+# The fifth Module.symvers column is an empty namespace, ending in a tab.
+profiles/**/Module.symvers whitespace=-blank-at-eol

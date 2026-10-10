@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "prebuilt": "prebuilt/mayfly/rekernel_x-lineage-mayfly.ko",
+  "prebuilt_sha256": "db926c6e0ffddf31d310ae2343c329f1b82346fc78420cf323565f2be9ecf0b2",
+  "module_source_commit": "afb5e6bc62c6b9702c823009566a58b2e53b7797",
+  "lkm_source_tree": "082f6e2e17faf302a518bc697661d799b483eedc",
+  "base_profile": "profiles/lineage-mayfly",
+  "compatible_profiles": [
+    "profiles/lineage-mayfly",
+    "profiles/lineage-mayfly-5.10.269"
+  ]
+}

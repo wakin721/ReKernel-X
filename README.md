@@ -1,29 +1,47 @@
 # ReKernel-X
 
-## LineageOS 小米 12S 定制构建
+## LineageOS 小米 12S 兼容复用
 
-此 fork 的默认分支 `lineage-mayfly` 基于上游 **1.6**，用于已经实机验证的
-`mayfly / 5.10.260-gki-gef362912d37b`。内核功能源码保持该版本，通过匹配的
-内核源码、真实配置、符号 CRC 和 Clang 工具链完成适配。
+此 fork 的默认分支 `lineage-mayfly` 基于上游 **1.6**。同一个原始定制模块
+可用于 `mayfly` 的以下内核：
 
-**下载与构建：** 打开 [专用 GitHub Actions](https://github.com/wakin721/ReKernel-X/actions/workflows/lineage-mayfly.yml)，
-选择成功的运行，在 Artifacts 下载 `ReKernel-X-LineageOS-mayfly-…`。
-解压 artifact，取出里面的 **`ReKernel-X-1.6-LineageOS-mayfly-5.10.260.zip`**，
+| 内核 | LineageOS 参考构建 |
+|---|---|
+| `5.10.260-gki-gef362912d37b` | `23.2-20260925-NIGHTLY-mayfly` |
+| `5.10.269-gki-g490755fcc6cc` | `23.2-20261009-NIGHTLY-mayfly` |
+
+功能源码和 `.ko` 保持原始验证版本，两个内核的 66 项导入 CRC 均匹配。
+配置检查只比较实际 CONFIG 选项，忽略顶部内核版本注释。
+
+**下载：** 打开 [无编译复用打包 Actions](https://github.com/wakin721/ReKernel-X/actions/workflows/reuse-mayfly.yml)，
+选择成功的运行，在 Artifacts 下载 `ReKernel-X-mayfly-compatible-…`。
+解压 artifact，取出里面的 **`ReKernel-X-1.6-LineageOS-mayfly-compatible.zip`**，
 在 KernelSU / Magisk 中安装这个内层 ZIP 后重启。不要直接安装整个 artifact。
 
-在 Actions 中点击 **Run workflow** 可以手动构建；推送到 `lineage-mayfly`
-且修改模块源码、适配配置或构建脚本时也会自动构建。流程不需要个人令牌或额外 Secrets。
-每个 artifact 包含模块、安装 ZIP、SHA256、构建日志及 ABI 校验结果，保存 30 天。
-本分支的专用流程不会自动发布 Release。
+在 Actions 中点击 **Run workflow** 可以手动打包；更新兼容档案或加载脚本后
+会自动运行。流程校验仓库内固定的旧模块及所有已收录内核的 CRC，运行加载策略测试，
+再生成 ZIP，**不下载 Clang、不编译模块**。无需个人令牌或额外 Secrets。
+每个 artifact 包含模块、安装 ZIP、SHA256、复用日志及 ABI 校验结果，保存 30 天。
+原来的 [编译流程](https://github.com/wakin721/ReKernel-X/actions/workflows/lineage-mayfly.yml)
+保留，供功能源码或 ABI 实际变化时使用；本分支不自动发布 Release。
 
-安装和启动均检查内核版本及配置摘要。保留 CFI、栈保护和 MODVERSIONS；
+安装和启动均检查已验证内核列表、实际配置摘要及模块完整性。保留 CFI、栈保护和 MODVERSIONS；
 若加载失败或上次启动未通过开机后 60 秒观察期，下一次启动会禁用模块。
 不提供上游通用版本的自动更新入口。启动保护不能覆盖所有运行时故障，
 首次使用新的构建仍需确认 NoActive 连接及实际操作正常。
 
-**升级系统或更换内核后必须重新适配。** 不能仅改版本字符串或选择另一个
-androidXX-5.10 预编译模块强行加载。源头及校验说明见
-[内核配置档案](profiles/lineage-mayfly/README.md)。`main` 保留上游分支。
+**已收录且配置一致的内核更新会直接复用模块。** 未收录内核会禁用模块，
+需要检查其配置、导出 CRC、Binder 内部结构/函数和 Hook 声明后补充兼容列表；
+检查通过即可重新打包，只有真正不兼容时才需适配或重编。
+不根据 `5.10.*` 通配符推定兼容，不改 vermagic，不移除 CRC，也不强制加载。
+源头及校验说明见 [原始内核档案](profiles/lineage-mayfly/README.md)、
+[5.10.269 兼容档案](profiles/lineage-mayfly-5.10.269/README.md)及
+[旧模块来源](prebuilt/mayfly/README.md)。`main` 保留上游分支。
+
+本地复用打包：创建 Python venv，执行 `pip install -r ci/mayfly/requirements.txt`，
+然后运行 `python ci/mayfly/reuse.py`；只做验证可用 `--verify-only`。
+测试：`python -m unittest discover -s ci/mayfly -p 'test_*.py' -v`。
+模块功能源码改变时复用流程会拒绝旧二进制，需要重新构建并更新固定模块及来源记录。
 
 本地构建使用 x86_64 Ubuntu 24.04：安装工作流列出的 apt 依赖，创建 Python venv，
 执行 `pip install -r ci/mayfly/requirements.txt`，再运行 `bash ci/mayfly/build.sh`。

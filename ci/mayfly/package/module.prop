@@ -1,6 +1,6 @@
 id=rekernel_x
 name=ReKernel-X (LineageOS Xiaomi 12S)
-version=1.6-lineage-mayfly-ef362912
-versionCode=7
+version=1.6-lineage-mayfly-compatible
+versionCode=8
 author=myflavor, Sakion Team; device-specific build by Codex
-description=仅适用于 mayfly / 5.10.260-gki-gef362912d37b；保留原生 CFI 和符号版本校验，含启动失败保护。
+description=mayfly 已验证内核兼容复用：5.10.260 / 5.10.269；保留 CFI、符号 CRC 和启动失败保护。

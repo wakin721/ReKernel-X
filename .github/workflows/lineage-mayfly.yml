@@ -6,16 +6,12 @@ on:
     branches: [lineage-mayfly]
     paths:
       - 'LKM-Source/**'
-      - 'profiles/lineage-mayfly/**'
-      - 'ci/mayfly/**'
-      - '.github/workflows/lineage-mayfly.yml'
+      - 'ci/mayfly/build.sh'
   pull_request:
     branches: [lineage-mayfly]
     paths:
       - 'LKM-Source/**'
-      - 'profiles/lineage-mayfly/**'
-      - 'ci/mayfly/**'
-      - '.github/workflows/lineage-mayfly.yml'
+      - 'ci/mayfly/build.sh'
 
 permissions:
   contents: read
