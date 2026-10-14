@@ -17,6 +17,13 @@ LineageOS 24 的内核使用 Clang 22，旧模块仍使用原始 Clang 21 构建
 四项工具链配置差异的精确值已单独记录并审查；安装和启动仍匹配每个内核自己的
 完整配置摘要，不会忽略编译器变化。静态验证不能替代首次实机 CFI/运行验证。
 
+2026-10-14 已在上述 LineageOS 24 构建实机验证
+[兼容包 92a79ed](https://github.com/wakin721/ReKernel-X/actions/runs/38545355287)：
+18 项 CI 测试通过，原始 `.ko` 未重编；正常 insmod 成功，Netlink/Hook 初始化成功，
+NoActive 日志显示“ReKernel-X通知正常”，开机后 60 秒观察期通过。
+用户确认已连接、应用切换操作正常，本次启动未观察到 CFI 故障。
+这是一次启动和操作验证，不代表所有运行路径或后续内核都已验证。
+
 **下载：** 打开 [无编译复用打包 Actions](https://github.com/wakin721/ReKernel-X/actions/workflows/reuse-mayfly.yml)，
 选择成功的运行，在 Artifacts 下载 `ReKernel-X-mayfly-compatible-…`。
 解压 artifact，取出里面的 **`ReKernel-X-1.6-LineageOS-mayfly-compatible.zip`**，
