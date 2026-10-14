@@ -1,0 +1,16 @@
+{
+  "device": "mayfly",
+  "lineage_build": "24.0-20261012-NIGHTLY-mayfly",
+  "kernel_release": "5.10.269-gki-geff4b40407a1",
+  "kernel_repository": "LineageOS/android_kernel_xiaomi_sm8450",
+  "kernel_commit": "eff4b40407a1b6f1b1ab84554cbb540bcb495175",
+  "config_sha256": "5122e1ef1ee0a24253af3dbb2fa4a0143383479ece766cb82250d0205e38f71e",
+  "symvers_sha256": "78ec7da348b07e2200c491704ecf8bd0f14bcd8aff4d9edc2cca7a967225bb01",
+  "kernel_exports": 14609,
+  "clang_revision": "r596125",
+  "clang_build": "15071444",
+  "clang_version": "22.0.2",
+  "clang_llvm_commit": "de03d430485c884861198b25459851f429cbdbad",
+  "upstream_rekernel_commit": "afb5e6bc62c6b9702c823009566a58b2e53b7797",
+  "module_version": "1.6-lineage-mayfly-ef362912"
+}

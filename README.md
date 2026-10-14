@@ -9,9 +9,13 @@
 |---|---|
 | `5.10.260-gki-gef362912d37b` | `23.2-20260925-NIGHTLY-mayfly` |
 | `5.10.269-gki-g490755fcc6cc` | `23.2-20261009-NIGHTLY-mayfly` |
+| `5.10.269-gki-geff4b40407a1` | `24.0-20261012-NIGHTLY-mayfly` |
 
-功能源码和 `.ko` 保持原始验证版本，两个内核的 66 项导入 CRC 均匹配。
+功能源码和 `.ko` 保持原始验证版本，三个内核的 66 项导入 CRC 均匹配。
 配置检查只比较实际 CONFIG 选项，忽略顶部内核版本注释。
+LineageOS 24 的内核使用 Clang 22，旧模块仍使用原始 Clang 21 构建。
+四项工具链配置差异的精确值已单独记录并审查；安装和启动仍匹配每个内核自己的
+完整配置摘要，不会忽略编译器变化。静态验证不能替代首次实机 CFI/运行验证。
 
 **下载：** 打开 [无编译复用打包 Actions](https://github.com/wakin721/ReKernel-X/actions/workflows/reuse-mayfly.yml)，
 选择成功的运行，在 Artifacts 下载 `ReKernel-X-mayfly-compatible-…`。
@@ -30,12 +34,13 @@
 不提供上游通用版本的自动更新入口。启动保护不能覆盖所有运行时故障，
 首次使用新的构建仍需确认 NoActive 连接及实际操作正常。
 
-**已收录且配置一致的内核更新会直接复用模块。** 未收录内核会禁用模块，
+**已收录且配置匹配该内核档案的更新会直接复用模块。** 未收录内核会禁用模块，
 需要检查其配置、导出 CRC、Binder 内部结构/函数和 Hook 声明后补充兼容列表；
 检查通过即可重新打包，只有真正不兼容时才需适配或重编。
 不根据 `5.10.*` 通配符推定兼容，不改 vermagic，不移除 CRC，也不强制加载。
 源头及校验说明见 [原始内核档案](profiles/lineage-mayfly/README.md)、
-[5.10.269 兼容档案](profiles/lineage-mayfly-5.10.269/README.md)及
+[5.10.269 兼容档案](profiles/lineage-mayfly-5.10.269/README.md)、
+[LineageOS 24 兼容档案](profiles/lineage-mayfly-5.10.269-los24/README.md)及
 [旧模块来源](prebuilt/mayfly/README.md)。`main` 保留上游分支。
 
 本地复用打包：创建 Python venv，执行 `pip install -r ci/mayfly/requirements.txt`，

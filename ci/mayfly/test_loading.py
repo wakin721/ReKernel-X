@@ -69,6 +69,18 @@ MODPATH='{self.module}'
         self.release = '5.10.260-gki-gef362912d37b'
         self.assertEqual(self.run_script('post-fs-data.sh').returncode, 0)
 
+    def test_los24_loads_only_its_reviewed_configuration(self):
+        self.release = '5.10.269-gki-geff4b40407a1'
+        self.config.write_bytes((ROOT / 'profiles/lineage-mayfly-5.10.269-los24/kernel.config').read_bytes())
+        result = self.run_script('post-fs-data.sh')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.directory / 'load-attempt').exists())
+
+    def test_los24_rejects_configuration_from_previous_kernel(self):
+        self.release = '5.10.269-gki-geff4b40407a1'
+        self.assertNotEqual(self.run_script('post-fs-data.sh').returncode, 0)
+        self.assertFalse((self.directory / 'load-attempt').exists())
+
     def test_unknown_patch_is_not_assumed_compatible(self):
         self.release = '5.10.270-gki-gunknown'
         self.assertNotEqual(self.run_script('post-fs-data.sh').returncode, 0)
