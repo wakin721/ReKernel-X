@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "prebuilt": "prebuilt/mayfly/rekernel_x-lineage-mayfly.ko",
-  "prebuilt_sha256": "db926c6e0ffddf31d310ae2343c329f1b82346fc78420cf323565f2be9ecf0b2",
-  "module_source_commit": "afb5e6bc62c6b9702c823009566a58b2e53b7797",
-  "lkm_source_tree": "082f6e2e17faf302a518bc697661d799b483eedc",
+  "prebuilt_sha256": "7d6b35f7d95d32cdb67d64913b8bfc99f1b8d96a34711b7f91bad43cb024a9e0",
+  "module_source_commit": "fb00b4a91d42a584a634046a0f59d67e068a77bc",
+  "lkm_source_tree": "4fb99a9d31ae8b6f0299adc874dff9c269002b30",
   "base_profile": "profiles/lineage-mayfly",
   "compatible_profiles": [
     "profiles/lineage-mayfly",

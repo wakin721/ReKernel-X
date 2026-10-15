@@ -1,23 +1,28 @@
-# Pinned, reusable ReKernel-X module
+# Pinned staged-initialization diagnostic module
 
-`rekernel_x-lineage-mayfly.ko` is the original locally compiled and device-tested
-module, not a new build for the later kernel:
+This binary was rebuilt once for the staged-init diagnostic on 2026-10-15.
+It is not the original 60,744-byte module.
 
-- SHA256: `db926c6e0ffddf31d310ae2343c329f1b82346fc78420cf323565f2be9ecf0b2`
-- Size: 60,744 bytes, debug information stripped only.
-- ReKernel-X source: upstream 1.6 commit
-  `afb5e6bc62c6b9702c823009566a58b2e53b7797`; complete source is in `LKM-Source`.
-- LKM-Source Git tree: `082f6e2e17faf302a518bc697661d799b483eedc`.
-- Kernel/config/toolchain: `profiles/lineage-mayfly`, compiled with
-  `ci/mayfly/build.sh`'s equivalent make options. The original local build used
-  ARM64 host gcc helpers and the official x86_64 Clang through QEMU; the target
-  module was AArch64. Compiler identification is in `compiler.txt`.
-- GPL license is the repository's `LICENSE`.
+- SHA256: `7d6b35f7d95d32cdb67d64913b8bfc99f1b8d96a34711b7f91bad43cb024a9e0`
+- Size: 64,144 bytes; only debug information stripped.
+- Module source commit: `fb00b4a91d42a584a634046a0f59d67e068a77bc`.
+- LKM-Source Git tree: `4fb99a9d31ae8b6f0299adc874dff9c269002b30`.
+- Based on upstream ReKernel-X 1.6 commit `afb5e6bc62c6b9702c823009566a58b2e53b7797`.
+- Kernel/config/toolchain: `profiles/lineage-mayfly`, original Android Clang
+  r563880c build14054515; compile arguments match `ci/mayfly/build.sh`.
+- Native CFI, stack protection, vermagic, and all 68 version entries retained.
+  All entries statically match each of the three recorded kernel profiles.
+- GPL license: repository LICENSE. Full source is packaged with the module.
 
-This binary passed original reboot, NoActive connection and interactive device
-testing. The repository's CI build produced an otherwise identical ELF with a
-different GNU build-id. The reuse workflow deliberately preserves this original
-binary and validates it against each recorded compatible kernel.
+The changed lifecycle exposes Netlink at init but keeps hooks off by default.
+A root-only, one-way sysfs parameter enables hooks after Android readiness.
+Host lifecycle and real shell policy tests do not prove phone boot stability.
+**Device reboot/NoActive verification remains pending for this diagnostic.**
 
-The fixed binary and hashes remain accessible after Actions artifacts expire.
-If LKM-Source changes, reuse fails until the binary/source provenance is updated.
+The previous binary SHA256 was
+`db926c6e0ffddf31d310ae2343c329f1b82346fc78420cf323565f2be9ecf0b2`.
+It remains in Git history at `92a79ed`, but was associated with early-boot
+SystemUI startup timeouts; do not automatically restore early loading.
+
+The reuse workflow packages this pinned diagnostic without recompiling it.
+Future source changes require rebuilding and updating this provenance again.

@@ -11,5 +11,5 @@
   "clang_repository_commit": "9916fb51ccb914d62d35ad9a7b9b21d2ef046928",
   "clang_build": "14054515",
   "upstream_rekernel_commit": "afb5e6bc62c6b9702c823009566a58b2e53b7797",
-  "module_version": "1.6-lineage-mayfly-ef362912"
+  "module_version": "1.6-mayfly-staged-diagnostic"
 }

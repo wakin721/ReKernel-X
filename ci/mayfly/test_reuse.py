@@ -33,7 +33,7 @@ class ReuseTests(unittest.TestCase):
 
     def test_los24_profile_reuses_original_binary_after_explicit_review(self):
         validation, kernels = check_compatible_profiles(ROOT, ROOT / 'prebuilt/mayfly/rekernel_x-lineage-mayfly.ko')
-        self.assertEqual(validation['validated_versions'], 66)
+        self.assertEqual(validation['validated_versions'], 68)
         current = next(k for k in kernels if k['kernel_release'] == '5.10.269-gki-geff4b40407a1')
         self.assertEqual(current['config_fingerprint'], '1a949c95bec22addd96dea0e636487e7c728547545cf578706730ce1b549e6b0')
 
@@ -97,7 +97,7 @@ class ReuseTests(unittest.TestCase):
         self.assertIn('5.10.260-gki-gef362912d37b', result.stdout)
         self.assertIn('5.10.269-gki-g490755fcc6cc', result.stdout)
         self.assertIn('5.10.269-gki-geff4b40407a1', result.stdout)
-        self.assertIn('"validated_versions": 66', result.stdout)
+        self.assertIn('"validated_versions": 68', result.stdout)
 
 
 if __name__ == '__main__':
