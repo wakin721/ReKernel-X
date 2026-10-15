@@ -1,4 +1,11 @@
-ReKernel-X 1.6 / LineageOS Xiaomi 12S 定制构建
+ReKernel-X 1.6 / LineageOS Xiaomi 12S 分阶段初始化诊断版
+
+旧版在部分开机中导致 SystemUI 启动超时。此版本仍需实机诊断验证。
+早期开机只提供 Netlink 接口，让 NoActive 能发现并连接；此时 Hook 尚未工作。
+必须在开机后 10 分钟内首次解锁。系统界面和锁屏服务稳定 10 秒后才启用 Hook。
+启用后再观察 60 秒；界面异常、激活失败或就绪超时会禁用下一次自动加载。
+失败标记不会因单纯 sys.boot_completed=1 而清除。
+Netlink 连接正常并不单独证明 Hook 已启用，请检查 load.log 的 stage=hooks active。
 
 支持已收录的 mayfly 内核：5.10.260-gki-gef362912d37b、5.10.269-gki-g490755fcc6cc、
 5.10.269-gki-geff4b40407a1（LineageOS 24）。首次使用仍需实机运行验证。

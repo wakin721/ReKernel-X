@@ -1,6 +1,42 @@
 # ReKernel-X
 
-## LineageOS 小米 12S 兼容复用
+## 分阶段初始化诊断版
+
+`diagnostic/staged-boot` 正在验证开机卡在“手机正在启动中”的问题。
+2026-10-15 的一次失败启动出现 12 个进程启动超时，SystemUI 被杀死后
+KeyguardService 为 DEAD、用户保持锁定；只禁用 ReKernel-X 的对照启动恢复正常。
+旧模块在解锁后加载成功，但 NoActive 没有重新连接，故简单延迟 insmod 不够。
+这些证据不能单独证明某个 Hook、CFI 或内核 ABI 是根因。
+
+本诊断版修改初始化流程，并**重新编译一次模块**：
+
+1. 开机早期只初始化规则表和原有 Netlink 接口，让 NoActive 按原时机发现模块。
+   此时 Binder、signal、netfilter 和 kprobe Hook 均未启用。
+2. 用户 0 在开机 10 分钟内首次解锁，且当前 SystemUI 进程的 SystemUIService/
+   KeyguardService 正常、前台不是 FallbackHome，连续稳定 10 秒后启用 Hook。
+3. 用 root 专用、只能单向开启的 `hooks_enabled` 参数激活 Hook。
+   激活失败回滚 Hook，保留传输层供诊断。不要手动修改参数来绕过就绪检查。
+4. 激活后继续观察 UI 60 秒。超时、激活失败或 UI 异常会禁用下一次自动加载，
+   并保留失败启动标记；不再只依赖 `sys.boot_completed=1` 判断成功。
+
+保留设备、内核、完整 CONFIG 指纹、模块 SHA256、内核原生 CRC/CFI/栈保护。
+新模块 68 项版本条目已静态匹配三个已收录内核；原始模块是 66 项。
+内核端生命周期和 shell 启动策略均有可执行回归测试。
+**目前仍待实机重启和 NoActive 功能验证，请勿当作已解决卡死的稳定版本。**
+
+日志在 `/data/adb/modules/rekernel_x/load.log`：
+`stage=transport` 只表示连接接口就绪；只有 `stage=hooks active` 才表示 Hook 工作，
+`stage=healthy` 表示 UI 与后续观察均通过。仅 NoActive 显示连接不足以证明功能全部启用。
+开机后 10 分钟未解锁也会保守地禁用下一次加载，需要手动重新启用。
+回退：在 Root 管理器禁用本模块后重启，保留现有应用数据。
+
+Actions 可选择本分支手动运行 `Package compatible mayfly module (no compilation)`，
+它验证固定的诊断二进制并打包，不再次编译；修改 C 功能后仍必须重新构建和更新来源记录。
+安装内层 `ReKernel-X-1.6-LineageOS-mayfly-staged-diagnostic.zip`，不要安装 artifact 外层 ZIP。
+
+## 历史兼容包说明
+
+以下说明属于旧版兼容包，其一次正常开机验证不能代表后续每次开机均稳定。
 
 此 fork 的默认分支 `lineage-mayfly` 基于上游 **1.6**。同一个原始定制模块
 可用于 `mayfly` 的以下内核：

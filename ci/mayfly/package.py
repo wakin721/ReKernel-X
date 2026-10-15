@@ -21,7 +21,8 @@ metadata = dict(profile, source_commit=commit, source_worktree_dirty=bool(dirty)
                 validation=validation, compatible_kernels=compatible_kernels,
                 module_reused_without_compilation=module_reused,
                 module_source_commit=manifest['module_source_commit'] if module_reused else commit,
-                runtime_test='CI validates ABI only; device testing is separate.')
+                runtime_test='Staged diagnostic: device boot and NoActive verification required.',
+                hook_activation_policy='Early Netlink only; user0 unlocked and UI stable 10s, then activate hooks and observe UI 60s; wait deadline 600s.')
 metadata['compiler'] = (dist / 'compiler.txt').read_text()
 metadata['config_diff'] = (dist / 'config-diff.txt').read_text()
 metadata_text = json.dumps(metadata, ensure_ascii=False, indent=2) + '\n'
@@ -45,7 +46,7 @@ files['source/README.md'] = (root / 'README.md').read_bytes()
 files['build-info.json'] = metadata_text.encode('utf-8')
 files[module.name] = module.read_bytes()
 files['module.sha256'] = (sha256(module) + '\n').encode('ascii')
-filename = 'ReKernel-X-1.6-LineageOS-mayfly-compatible.zip'
+filename = 'ReKernel-X-1.6-LineageOS-mayfly-staged-diagnostic.zip'
 with zipfile.ZipFile(dist / filename, 'w', zipfile.ZIP_DEFLATED) as archive:
     for name, content in sorted(files.items()):
         entry = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))

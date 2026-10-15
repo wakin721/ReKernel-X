@@ -25,6 +25,9 @@ echo "Validated kernel: $(uname -r); reusing module with native CRC checks." > "
 insmod "$MODDIR/rekernel_x-lineage-mayfly.ko" >> "$LOG" 2>&1
 result=$?
 echo "insmod_exit=$result" >> "$LOG"
+if [ "$result" -eq 0 ]; then
+    echo "stage=transport ready; hooks stay off until UI readiness is verified." >> "$LOG"
+fi
 if [ "$result" -ne 0 ]; then
     touch "$MODDIR/disable"
     rm -f "$MODDIR/.boot-pending"
