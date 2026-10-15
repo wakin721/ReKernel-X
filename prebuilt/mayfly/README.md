@@ -17,7 +17,16 @@ It is not the original 60,744-byte module.
 The changed lifecycle exposes Netlink at init but keeps hooks off by default.
 A root-only, one-way sysfs parameter enables hooks after Android readiness.
 Host lifecycle and real shell policy tests do not prove phone boot stability.
-**Device reboot/NoActive verification remains pending for this diagnostic.**
+**Device test on 2026-10-15 failed to resolve the boot problem.** Netlink-only
+early initialization (`hooks_enabled=N`, never activated) still coincided with
+12 process start timeouts and dead Keyguard/FallbackHome. This is not a stable
+fix. The result narrows investigation toward the early client/injection path,
+and does not identify a particular kernel hook or establish an ABI/CFI failure.
+An authorized NoActive-injection-off control was confounded by an earlier
+Lineage charging HAL wait (`ChargingControlController -> waitForDeclaredService`)
+and a 65-second system_server Watchdog. NoActive's original enabled state was
+restored and ReKernel-X autoload disabled. Do not attribute the failure to
+NoActive or LSPosed from that inconclusive control.
 
 The previous binary SHA256 was
 `db926c6e0ffddf31d310ae2343c329f1b82346fc78420cf323565f2be9ecf0b2`.

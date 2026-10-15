@@ -22,7 +22,18 @@ KeyguardService 为 DEAD、用户保持锁定；只禁用 ReKernel-X 的对照�
 保留设备、内核、完整 CONFIG 指纹、模块 SHA256、内核原生 CRC/CFI/栈保护。
 新模块 68 项版本条目已静态匹配三个已收录内核；原始模块是 66 项。
 内核端生命周期和 shell 启动策略均有可执行回归测试。
-**目前仍待实机重启和 NoActive 功能验证，请勿当作已解决卡死的稳定版本。**
+**2026-10-15 实机对照未解决卡死，请勿当作稳定版本安装。**
+内核记录早期只有 Netlink 就绪，`hooks_enabled=N` 全程未开启，仍然出现
+12 个进程启动超时、SystemUI 被杀死、KeyguardService DEAD 和 FallbackHome。
+这排除了“必须先开启本模块 Binder/kprobe Hook 才发生故障”的解释；
+随后经明确授权，只暂停 NoActive user0 注入、保留其他模块作了对照。
+该轮却在更早的 LineageOS HealthInterfaceService 初始化阶段，等待
+ChargingControlController 的 `waitForDeclaredService`，触发 65 秒主线程 Watchdog。
+同样的充电 HAL 等待在 10:20 的历史启动也出现过，因而没有得到可用于归责
+NoActive/LSPosed 的干净对照。不要把 Binder 延迟或某个模块启用直接等同于根因。
+测试后 NoActive 与全部 Xposed 启用状态均已恢复原值，ReKernel-X 保持禁用以恢复手机。
+新保护正确保留失败标记，没有把 `boot_completed=1` 误当作 UI 正常。
+源码/ABI/35 项测试通过仅证明相应静态和策略行为，不能证明实机开机稳定。
 
 日志在 `/data/adb/modules/rekernel_x/load.log`：
 `stage=transport` 只表示连接接口就绪；只有 `stage=hooks active` 才表示 Hook 工作，
